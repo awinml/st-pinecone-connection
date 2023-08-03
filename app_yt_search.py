@@ -5,17 +5,17 @@ from sentence_transformers import SentenceTransformer
 
 @st.cache_resource
 def init_retriever():
-    return SentenceTransformer("flax-sentence-embeddings/all_datasets_v3_mpnet-base")
+    return SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
 
 
-def card(thubmnail, title, url, context):
+def card(thumbnail, title, url, context):
     return st.markdown(
         f"""
     <div class="container-fluid">
         <div class="row align-items-start">
             <div class="col-md-4 col-sm-4">
                  <div class="position-relative">
-                     <a href={url}><img src={thubmnail} class="img-fluid" style="width: 192px; height: 106px"></a>
+                     <a href={url}><img src={thumbnail} class="img-fluid" style="width: 192px; height: 106px"></a>
                  </div>
              </div>
              <div  class="col-md-8 col-sm-8">
@@ -32,10 +32,27 @@ def card(thubmnail, title, url, context):
     )
 
 
-st.write(
+st.markdown(
     """
 # YouTube Q&A
-Ask me a question!
+
+The app matches the natural language question to the video transcripts and finds you similar videos. It will give you links to YouTube Videos that match your search question.
+
+The app will query a vector database (Pinecone) and perform Semantic Search. 
+
+The dataset was taken from HuggingFace: [Youtube Video Transcriptions](https://huggingface.co/datasets/pinecone/yt-transcriptions).
+
+This app is an official submission to the Streamlit Connections Hackathon.
+- [Hackathon Link](https://discuss.streamlit.io/t/connections-hackathon/47574)
+- [GitHub Repo](https://github.com/awinml/st-pinecone-connection)
+- [Pinecone Vector Database](https://www.pinecone.io/)
+
+Some URLs and Images may not show up when searching for certain keywords, due to missing values in the original dataset. It does affect the performance of the vector database or the app.
+
+Some topics that you can search for: 
+- Reinforcement Learning
+- GANs
+- Tensorflow
 """
 )
 
@@ -57,11 +74,10 @@ cursor = conn.cursor()
 
 retriever = init_retriever()
 
-query_str = st.text_input("Search!", "")
+query_str = st.text_input("Please enter Search Query:", "")
 
 if query_str != "":
     xq = retriever.encode([query_str]).tolist()
-    # index = conn.connect_index("youtube-search")
     xc = conn.query(
         index_name="youtube-search", query_vector=xq, top_k=5, include_metadata=True
     )
