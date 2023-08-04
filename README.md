@@ -28,6 +28,11 @@ We built a Streamlit demo with this connector, called "YouTube Q&A", designed to
 
 The live demo of the "YouTube Q&A" app is accessible through [Streamlit Community Cloud](https://st-pinecone-connection.streamlit.app/).
 
+### Demo:
+
+[st-pinecone-connection-yt-search-demo.webm](https://github.com/awinml/st-pinecone-connection/assets/97467100/e584d06f-77bd-4d7c-b980-c1404648c0d2)
+
+
 ### Dataset:
 
 The app's dataset is sourced from HuggingFace, specifically the [Youtube Video Transcriptions](https://huggingface.co/datasets/pinecone/yt-transcriptions) dataset.
