@@ -1,14 +1,18 @@
 import streamlit as st
-from connection import PineconeConnection
+from st_pinecone_connection import PineconeConnection
 from sentence_transformers import SentenceTransformer
 
 
+# Function to initialize the sentence transformer model
 @st.cache_resource
 def init_retriever():
+    """Initialize and cache the SentenceTransformer model."""
     return SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
 
 
+# Function to create a card displaying video information
 def card(thumbnail, title, url, context):
+    """Generate an HTML card to display video information."""
     return st.markdown(
         f"""
     <div class="container-fluid">
@@ -32,57 +36,86 @@ def card(thumbnail, title, url, context):
     )
 
 
+# Main Streamlit app code
+st.header("YouTube Q&A: Find Similar Videos with Timestamps")
 st.markdown(
     """
-# YouTube Q&A
+Welcome to the YouTube Q&A app, an official submission to the Streamlit Connections Hackathon.
 
-The app matches the natural language question to the video transcripts and finds you similar videos. It will give you links to YouTube Videos that match your search question.
+The YouTube Q&A app helps you discover videos with similar content to your natural language questions. It leverages advanced Semantic Search techniques and the Pinecone Vector Database to efficiently match your query with video transcripts. Moreover, it provides direct links to the exact timestamps in the videos where your questions are answered.
 
-The app will query a vector database (Pinecone) and perform Semantic Search. 
+Happy exploring and enjoy discovering new content with pinpoint accuracy!
 
-The dataset was taken from HuggingFace: [Youtube Video Transcriptions](https://huggingface.co/datasets/pinecone/yt-transcriptions).
+"""
+)
 
-This app is an official submission to the Streamlit Connections Hackathon.
+with st.sidebar:
+    st.markdown(
+        """
+    ### How it Works:
+1. Enter your question in natural language in the search box.
+2. The app will use the Pinecone Vector Database (using the Streamlit Connection API) to find the most relevant videos and their corresponding timestamps for your query.
+3. Get instant access to the YouTube videos that best match your search.
+
+### Dataset:
+The app's dataset is sourced from HuggingFace, specifically the [Youtube Video Transcriptions](https://huggingface.co/datasets/pinecone/yt-transcriptions) dataset.
+
+### Important Links:
 - [Hackathon Link](https://discuss.streamlit.io/t/connections-hackathon/47574)
 - [GitHub Repo](https://github.com/awinml/st-pinecone-connection)
 - [Pinecone Vector Database](https://www.pinecone.io/)
 
-Some URLs and Images may not show up when searching for certain keywords, due to missing values in the original dataset. It does affect the performance of the vector database or the app.
+### Note:
+- Some URLs and images may not appear for certain keywords due to missing values in the original dataset. However, this does not impact the performance of the vector database or the app.
+- Try searching for topics like "What is Reinforcement Learning?", "Explain GANs.", or "What is the difference between Tensorflow and Keras?".
 
-Some topics that you can search for: 
-- Reinforcement Learning
-- GANs
-- Tensorflow
+### Made by:
+**[Ashwin Mathur](https://github.com/awinml)**
 """
-)
+    )
 
-st.markdown(
-    """
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-""",
-    unsafe_allow_html=True,
-)
 
 # Connect app to Pinecone Client
 conn = st.experimental_connection(
     "PineconeVectorDB",
     type=PineconeConnection,
     environment="us-west1-gcp-free",
-    api_key=st.secrets["api_key"],
+    api_key=st.secrets["api_key"],  # Your Pinecone API key stored in Streamlit secrets
 )
-cursor = conn.cursor()
 
+cursor = conn.cursor()
 retriever = init_retriever()
 
-query_str = st.text_input("Please enter Search Query:", "")
+# Sample questions
+
+option = st.selectbox(
+    "Select Sample Question or type in Search Query below:",
+    (
+        "---- Select Question ----",
+        "What is Reinforcement Learning?",
+        "What are GANs?",
+        "What is the difference between Tensorflow and Keras?",
+    ),
+    placeholder="",
+)
+
+
+if option == "---- Select Question ----":
+    option = ""
+
+
+# Input box to enter the search query
+
+query_str = st.text_input("Please enter Search Query:", option)
 
 if query_str != "":
-    xq = retriever.encode([query_str]).tolist()
+    xq = retriever.encode([query_str]).tolist()  # Encoding the search query
     xc = conn.query(
         index_name="youtube-search", query_vector=xq, top_k=5, include_metadata=True
-    )
+    )  # Querying Pinecone database with the encoded query
 
-    for context in xc:
+    for context in xc["matches"]:
+        # Displaying video information using the card function
         card(
             context["metadata"]["thumbnail"],
             context["metadata"]["title"],
