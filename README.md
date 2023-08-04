@@ -5,6 +5,8 @@
 This project is a submission for the [Streamlit Connections Hackathon 2023](https://discuss.streamlit.io/t/connections-hackathon/47574).
 It delivers a Streamlit connector for the [Pinecone](https://www.pinecone.io/) vector database.
 
+The demo app can be viewed at: https://st-pinecone-connection.streamlit.app/
+
 ## Overview
 
 The Streamlit-Pinecone Connector enables developers to connect to a Pinecone database with the following Python code:
@@ -18,7 +20,7 @@ conn = st.experimental_connection(
 )
 ```
 
-We built a Streamlit demo with this connector, called "YouTube Q&A", designed to search through [Youtube Video Transcriptions](https://huggingface.co/datasets/pinecone/yt-transcriptions). It uses advanced Semantic Search techniques and the Pinecone Vector Database to efficiently match your query with video transcripts. Moreover, it provides direct links to the exact timestamps in the videos where your questions are answered.
+I built a Streamlit demo with this connector, called "YouTube Q&A", designed to search through [Youtube Video Transcriptions](https://huggingface.co/datasets/pinecone/yt-transcriptions). It uses advanced Semantic Search techniques and the Pinecone Vector Database to efficiently match your query with video transcripts. Moreover, it provides direct links to the exact timestamps in the videos where your questions are answered.
 
 ### How it Works:
 
@@ -29,6 +31,7 @@ We built a Streamlit demo with this connector, called "YouTube Q&A", designed to
 The live demo of the "YouTube Q&A" app is accessible through [Streamlit Community Cloud](https://st-pinecone-connection.streamlit.app/).
 
 ### Demo:
+Link to app: https://st-pinecone-connection.streamlit.app/
 
 [st-pinecone-connection-yt-search-demo.webm](https://github.com/awinml/st-pinecone-connection/assets/97467100/e584d06f-77bd-4d7c-b980-c1404648c0d2)
 
